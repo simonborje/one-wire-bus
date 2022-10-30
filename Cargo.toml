@@ -14,3 +14,5 @@ A Rust implementation of the 1-Wire protocol for embedded-hal
 
 [dependencies]
 embedded-hal = {version="0.2.3", features=["unproven"]}
+esp-idf-sys = "0.31.10"
+scopeguard = "1.1.0"

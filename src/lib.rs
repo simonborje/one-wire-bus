@@ -2,6 +2,7 @@
 
 use embedded_hal::blocking::delay::DelayUs;
 use embedded_hal::digital::v2::{InputPin, OutputPin};
+use esp_idf_sys;
 
 mod address;
 pub mod commands;
@@ -90,16 +91,22 @@ where
         self.set_bus_low()?;
         delay.delay_us(480); // Maxim recommended wait time
 
+        let _critical_section_guard = scopeguard::guard((), |_| unsafe { esp_idf_sys::vPortExitCritical() });
+        unsafe { esp_idf_sys::vPortEnterCritical() };
         self.release_bus()?;
         delay.delay_us(70); // Maxim recommended wait time
 
         let device_present = self.is_bus_low()?;
+
+        drop(_critical_section_guard);
 
         delay.delay_us(410); // Maxim recommended wait time
         Ok(device_present)
     }
 
     pub fn read_bit(&mut self, delay: &mut impl DelayUs<u16>) -> OneWireResult<bool, E> {
+        let _critical_section_guard = scopeguard::guard((), |_| unsafe { esp_idf_sys::vPortExitCritical() });
+        unsafe { esp_idf_sys::vPortEnterCritical() };
         self.set_bus_low()?;
         delay.delay_us(6); // Maxim recommended wait time
 
@@ -133,6 +140,8 @@ where
     }
 
     pub fn write_1_bit(&mut self, delay: &mut impl DelayUs<u16>) -> OneWireResult<(), E> {
+        let _critical_section_guard = scopeguard::guard((), |_| unsafe { esp_idf_sys::vPortExitCritical() });
+        unsafe { esp_idf_sys::vPortEnterCritical() };
         self.set_bus_low()?;
         delay.delay_us(6); // Maxim recommended wait time
 
@@ -142,6 +151,8 @@ where
     }
 
     pub fn write_0_bit(&mut self, delay: &mut impl DelayUs<u16>) -> OneWireResult<(), E> {
+        let _critical_section_guard = scopeguard::guard((), |_| unsafe { esp_idf_sys::vPortExitCritical() });
+        unsafe { esp_idf_sys::vPortEnterCritical() };
         self.set_bus_low()?;
         delay.delay_us(60); // Maxim recommended wait time
 
